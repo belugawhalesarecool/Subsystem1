@@ -108,6 +108,10 @@ public final class Constants {
     public final static int DRIVE_FRONT_RIGHT = 2;
     public final static int DRIVE_BACK_LEFT = 3;
     public final static int DRIVE_BACK_RIGHT = 4;
+
+    // Elevator
+    public final static int ELEVATOR_LEFT = 1;
+    public final static int ELEVATOR_RIGHT = 2;
   };
 
   public static double PI = 3.141592653589793238462643;
@@ -117,4 +121,13 @@ public final class Constants {
   // https://www.revrobotics.com/rev-11-1271/
 
   public final static int NEO_CURRENT_LIMIT = 80; // amps
+
+  public static final class Elevator{
+    public static final class PHysicalConstants{
+
+    }
+  }
+
+
+  
 }

@@ -7,7 +7,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import static frc.robot.Constants.UPDATE_PERIOD;
-
+// Used to run the subsystem physically
 public class ElevatorIOSparkMax implements ElevatorIO{
     
     private final CANSparkMax elevatorMotor;

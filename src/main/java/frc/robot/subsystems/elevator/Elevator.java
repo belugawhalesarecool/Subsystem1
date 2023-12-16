@@ -35,6 +35,38 @@ public class Elevator extends SubsystemBase {
         elevatorFollowerMotor.follow(elevatorMotor, false); // following
     }
 
+     @Override
+        public void periodic() {
+            io.updateInputs(inputs);
+            Logger.getInstance().processInputs("Elevator", inputs);
+    
+            ElevatorMechanism.setLength(io.getDistance());
+    
+            // Update the PID constants if they have changed
+            if (p.get() != io.getP()) 
+                io.setP(p.get());
+            
+            if (i.get() != io.getI())
+                io.setI(i.get());
+            
+            if (d.get() != io.getD())
+                io.setD(d.get());
+            
+            if (ff.get() != io.getFF())
+                io.setFF(ff.get());
+            
+            Logger.getInstance().processInputs("Elevator", inputs);
+        }
+
+  public void setVoltage(double motorVolts) {
+    if (io.getDistance() > io.ELEVATOR_MAX_HEIGHT && motorVolts > 0) {
+        motorVolts = 0;
+    } else if (io.getDistance() < io.ELEVATOR_MIN_HEIGHT && motorVolts < 0) {
+        motorVolts = 0;
+    }
+
+    io.setVoltage(motorVolts);
+}
   
     public void update() {
     switch(state) {

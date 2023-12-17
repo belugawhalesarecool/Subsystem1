@@ -42,7 +42,7 @@ public class Elevator extends SubsystemBase {
     
             ElevatorMechanism.setLength(io.getDistance());
     
-            // Update the PID constants if they have changed
+            // 
             if (p.get() != io.getP()) 
                 io.setP(p.get());
             

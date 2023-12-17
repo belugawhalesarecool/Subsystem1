@@ -5,15 +5,20 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
     @AutoLog
-    public static class ElevatorIOInputs {
-       
-    }
+    public static class ElevatorIOInputs {}
 
-    public default void setVoltage(double rightVolt, double leftVolt){
-    }
+    public default void setVoltage(double rightVolt, double leftVolt){}
     
-    public void updateInputs(ElevatorIOInputs inputs) {
-        
-    }
+    // Updates the set of loggable inputs. 
+    public void updateInputs(ElevatorIOInputs inputs) {}
 
+    //Methods for PID 
+    public default void setP(double p) {}    
+    public default void setI(double i) {}
+    public default void setD(double d) {}
+    public default void setFF(double ff) {}
+    public default double getP() { return 0.0; }
+    public default double getI() { return 0.0; }
+    public default double getD() { return 0.0; }
+    public default double getFF() { return 0.0; }
 }

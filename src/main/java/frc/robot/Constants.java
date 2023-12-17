@@ -109,7 +109,7 @@ public final class Constants {
     public final static int DRIVE_BACK_LEFT = 3;
     public final static int DRIVE_BACK_RIGHT = 4;
 
-    // Elevator
+    // Elevator Motor ID's
     public final static int ELEVATOR_MOTOR = 1;
     public final static int ELEVATOR_MOTOR_FOLLOWER = 2;
   };

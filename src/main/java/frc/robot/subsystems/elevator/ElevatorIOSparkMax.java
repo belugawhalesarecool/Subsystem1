@@ -1,4 +1,4 @@
-gpackage frc.robot.subsystems.elevator;
+package frc.robot.subsystems.elevator;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -10,53 +10,54 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import static frc.robot.Constants.Elevator.ElevatorPhysicalConstants.*;
 import static frc.robot.Constants.ElectricalLayout.*;
 import static frc.robot.Constants.*;
-import static frc.robot.Constants.Elevator.ElevatorPhysicalConstants.*;
-// Used to run the subsystem physically
  
 public class ElevatorIOSparkMax implements ElevatorIO{
 
     //Initializes motors, encoders, PID controllers
     private final CANSparkMax elevatorMotor;
-    private final CANSparkMax elevatorMotorFollower;
     private RelativeEncoder elevatorEncoder;
     private SparkMaxPIDController elevatorPIDController;
+    private DutyCycleEncoder absoluteEncoder;
+    public double setpoint = 0;
 
     public ElevatorIOSparkMax() {
-        elevatorMotor = new CANSparkMax(1, MotorType.kBrushless);
-        elevatorMotorFollower = new CANSparkMax(4, MotorType.kBrushless);
-        configureEncoders();
+        elevatorMotor = new CANSparkMax(ELEVATOR_MOTOR, MotorType.kBrushless);
+        elevatorMotor.restoreFactoryDefaults();
+        elevatorMotor.setIdleMode(IdleMode.kBrake);
+        elevatorMotor.setSmartCurrentLimit(NEO_CURRENT_LIMIT);
 
-    }
+        elevatorPIDController = elevatorMotor.getPIDController();
+        elevatorPIDController.setOutputRange(-1, 1);
 
-    private void configureEncoders() {
         elevatorEncoder = elevatorMotor.getEncoder();
-        
-    
-        leftEncoder.setPositionConversionFactor(Math.PI * DRIVE_WHEEL_DIAM_M / DRIVE_GEARBOX_REDUCTION);
-        rightEncoder.setPositionConversionFactor(Math.PI * DRIVE_WHEEL_DIAM_M / DRIVE_GEARBOX_REDUCTION);
-        leftEncoder.setVelocityConversionFactor(Math.PI * DRIVE_WHEEL_DIAM_M / DRIVE_GEARBOX_REDUCTION / 60.0);
-        rightEncoder.setVelocityConversionFactor(Math.PI * DRIVE_WHEEL_DIAM_M / DRIVE_GEARBOX_REDUCTION / 60.0);*/
-    
+        elevatorEncoder.setPositionConversionFactor(ELEVATOR_REV_TO_POS_FACTOR);
+        elevatorEncoder.setVelocityConversionFactor(ELEVATOR_REV_TO_POS_FACTOR / 60);
+        elevatorEncoder.setPosition(0.6);
 
-        elevatorEncoder.setPosition(0);
+        absoluteEncoder = new DutyCycleEncoder(0);
+        absoluteEncoder.setDistancePerRotation(360.0 / 1024.0);
+        absoluteEncoder.setDutyCycleRange(1 / 1024.0, 1023.0 / 1024.0);
+
+        elevatorEncoder.setPosition(absoluteEncoder.getDistance() * 28.45 + 0.6);
+
     }
 
     //Not sure if this is needed, as the methods at the bottom seem to do the same thing
-    @Override
     public void setPIDConstants(double p, double i, double d, double ff) {
-        pidController.setP(p);
-        pidController.setI(i);
-        pidController.setD(d);
-        pidController.setFF(ff);
+        elevatorPIDController.setP(p);
+        elevatorPIDController.setI(i);
+        elevatorPIDController.setD(d);
+        elevatorPIDController.setFF(ff);
     }
 
     //Updates the set of loggable inputs
     @Override
     public void updateInputs(ElevatorIOInputs inputs) {
-        inputs.positionMeters = encoder.getPosition();
-        inputs.velocityMeters = encoder.getVelocity();
+        inputs.positionMeters = elevatorEncoder.getPosition();
+        inputs.velocityMeters = elevatorEncoder.getVelocity();
         inputs.appliedVolts = elevatorMotor.getAppliedOutput() * elevatorMotor.getBusVoltage();
         inputs.currentAmps = new double[] {elevatorMotor.getOutputCurrent()};
         inputs.tempCelsius = new double[] {elevatorMotor.getMotorTemperature()};
@@ -64,45 +65,53 @@ public class ElevatorIOSparkMax implements ElevatorIO{
 
     //Runs motors at correct voltage
     @Override
-    public void setVoltage(double rightVolt, double leftVolt ) {
-        elevatorMotor.setVoltage(rightVolt, leftVolt);
+    public void setVoltage(double voltage) {
+        elevatorMotor.setVoltage(voltage);
     }
 
     //Returns distance measurement
-    @Override
+    
     public double getDistance() {
-        return encoder.getPosition();
+        return elevatorEncoder.getPosition();
     }
 
     
     //Setpoint variables
-    @Override
+    
     public void goToSetpoint(double setpoint) {
         this.setpoint = setpoint;
-        pidController.setReference(setpoint, CANSparkMax.ControlType.kPosition);
+        elevatorPIDController.setReference(setpoint, CANSparkMax.ControlType.kPosition);
     }
 
-    @Override
+    
     public void setBrake(boolean brake) {
         elevatorMotor.setIdleMode(brake ? IdleMode.kBrake : IdleMode.kCoast);
     }
 
-    @Override
+    
     public boolean atSetpoint() {
-        return Math.abs(encoder.getPosition() - setpoint) < ELEVATOR_PID_TOLERANCE;
+        return Math.abs(elevatorEncoder.getPosition() - setpoint) < ELEVATOR_PID_TOLERANCE;
     }
 
 
     @Override
     //Methods for PID 
-    public default void setP(double p) {}    
-    public default void setI(double i) {}
-    public default void setD(double d) {}
-    public default void setFF(double ff) {}
-    public default double getP() { return 0.0; }
-    public default double getI() { return 0.0; }
-    public default double getD() { return 0.0; }
-    public default double getFF() { return 0.0; }
+    public void setP(double p) {
+        elevatorPIDController.setP(p);
+    }    
+    public void setI(double i) {
+        elevatorPIDController.setI(i);
+    }
+    public void setD(double d) {
+        elevatorPIDController.setD(d);
+    }
+    public void setFF(double ff) {
+        elevatorPIDController.setFF(ff);
+    }
+    public double getP() { return elevatorPIDController.getP();}
+    public double getI() { return elevatorPIDController.getI(); }
+    public double getD() { return elevatorPIDController.getD(); }
+    public double getFF() { return elevatorPIDController.getFF(); }
     
 }
 

@@ -8,6 +8,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import com.revrobotics.SparkMaxPIDController;
 
 import static frc.robot.Constants.Elevator.ElevatorSimConstants.*;
 
@@ -62,90 +63,67 @@ public class ElevatorIOSim implements ElevatorIO{
         // inputs.voltage = new double[] {sim.getBusVoltageV()};
     }
 
-    @Override
-    public void setPIDConstants(double p, double i, double d, double ff) {
-        pidController.setP(p);
-        pidController.setI(i);
-        pidController.setD(d);
-        pidController.setFF(ff);
-    }
 
-    @Override
-    public void updateInputs(ElevatorIOInputs inputs) {
-        inputs.positionMeters = encoder.getPosition();
-        inputs.velocityMeters = encoder.getVelocity();
-        inputs.appliedVolts = elevatorMotor.getAppliedOutput() * elevatorMotor.getBusVoltage();
-        inputs.currentAmps = new double[] {elevatorMotor.getOutputCurrent()};
-        inputs.tempCelsius = new double[] {elevatorMotor.getMotorTemperature()};
-    }
 
        
     @Override
     public void setVoltage(double motorVolts) {
-        elevatorMotor.setVoltage(motorVolts);
+        sim.setInputVoltage(motorVolts);
     }
 
     
     @Override
     public double getDistance() {
-        return encoder.getPosition();
+        return sim.getPositionMeters();
     }
 
     
     @Override
     public void goToSetpoint(double setpoint) {
-        this.setpoint = setpoint;
-        pidController.setReference(setpoint, CANSparkMax.ControlType.kPosition);
-    }
-
-    @Override
-    public void setBrake(boolean brake) {
-        elevatorMotor.setIdleMode(brake ? IdleMode.kBrake : IdleMode.kCoast);
-    }
-
-    @Override
-    public boolean atSetpoint() {
-        return Math.abs(encoder.getPosition() - setpoint) < ELEVATOR_PID_TOLERANCE;
+        m_controller.setGoal(setpoint);
+        double pidOutput = m_controller.calculate(m_encoder.getDistance());
+        double feedForwardOutput = m_feedforward.calculate(m_controller.getSetpoint().velocity);
+        sim.setInputVoltage(feedForwardOutput + pidOutput);
     }
  
     @Override
     public void setP(double p) {
-        pidController.setP(p);
+        m_controller.setP(p);
     }
 
     @Override
     public void setI(double i) {
-        pidController.setI(i);
+        m_controller.setI(i);
     }
 
     @Override
     public void setD(double d) {
-        pidController.setD(d);
+        m_controller.setD(d);
     }
 
     @Override
     public void setFF(double ff) {
-        pidController.setFF(ff);
+        m_feedforward = new ElevatorFeedforward(kElevatorkS, kElevatorkG, ff, kElevatorkA);
     }
 
     @Override
     public double getP() {
-        return pidController.getP();
+        return m_controller.getP();
     }
 
     @Override
     public double getI() {
-        return pidController.getI();
+        return m_controller.getI();
     }
 
     @Override
     public double getD() {
-        return pidController.getD();
+        return m_controller.getD();
     }
 
     @Override
     public double getFF() {
-        return pidController.getFF();
+       return m_feedforward.calculate(m_controller.getSetpoint().velocity);
     }
 
     

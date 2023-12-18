@@ -122,10 +122,46 @@ public final class Constants {
 
   public final static int NEO_CURRENT_LIMIT = 80; // amps
 
-  public static final class Elevator{
-    public static final class PHysicalConstants{
+  public static class Elevator {
+    public static class ElevatorSimConstants {
+      public static final int kMotorPort = 0;
+      public static final int kEncoderAChannel = 0;
+      public static final int kEncoderBChannel = 1;
+      public static final int kJoystickPort = 0;
 
+      public static final double kElevatorKp = 5;
+      public static final double kElevatorKi = 0;
+      public static final double kElevatorKd = 0;
+
+      public static final double kElevatorkS = 0.0; // volts (V)
+      public static final double kElevatorkG = 0.762; // volts (V)
+      public static final double kElevatorkV = 0.762; // volt per velocity (V/(m/s))
+      public static final double kElevatorkA = 0.0; // volt per acceleration (V/(m/s²))
+
+      public static final double kElevatorGearing = 10.0;
+      public static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
+      public static final double kCarriageMass = 4.0; // kg
+
+      public static final double kSetpointMeters = 0.75;
+      // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
+      public static final double kMinElevatorHeightMeters = 0.0;
+      public static final double kMaxElevatorHeightMeters = 2.25;
+
+      // distance per pulse = (distance per revolution) / (pulses per revolution)
+      // = (Pi * D) / ppr
+      public static final double kElevatorEncoderDistPerPulse = 2.0 * Math.PI * kElevatorDrumRadius / 4096;
     }
+    public static final class ElevatorPhysicalConstants{
+      public static final double[] ELEVATOR_PID = new double[] {1.0, 0, 0, 0};
+      public static double ELEVATOR_PID_MAX_OUTPUT = 0.7;
+      public static double ELEVATOR_REV_TO_POS_FACTOR = 1;
+      public static double ELEVATOR_PID_TOLERANCE = 3;
+      public static final double ELEVATOR_SETPOINT_RETRACT = 0;
+      public static final double ELEVATOR_SETPOINT_EXTEND = 32;
+      public static final double ELEVATOR_SETPOINT_MIDDLE = (ELEVATOR_SETPOINT_RETRACT + ELEVATOR_SETPOINT_EXTEND) / 2;
+      public static final double ELEVATOR_STOP_BUFFER = 5;
+    }
+    public static final double ELEVATOR_TOLERANCE = 3;
   }
 
 

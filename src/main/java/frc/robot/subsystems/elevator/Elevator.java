@@ -30,7 +30,7 @@ public class Elevator extends SubsystemBase {
 
     private final ElevatorIO io;
 
-    // Create a Mechanism2d visualization of the elevator
+    // Create a Mechanism2d visualization of the elevator (get better explanation)
     private MechanismLigament2d ElevatorMechanism;
 
     public Elevator(ElevatorIO io) {
@@ -80,7 +80,7 @@ public class Elevator extends SubsystemBase {
     public void move(double speed) {
         setVoltage(speed * 12);
     }
-
+//same as startPID
     public void runPID() {
         io.goToSetpoint(setpoint);
     }

@@ -85,6 +85,9 @@ public class ElevatorIOSim implements ElevatorIO{
         double feedForwardOutput = m_feedforward.calculate(m_controller.getSetpoint().velocity);
         sim.setInputVoltage(feedForwardOutput + pidOutput);
     }
+
+    //what about getDistance
+    //what about atSetpoint
  
     @Override
     public void setP(double p) {

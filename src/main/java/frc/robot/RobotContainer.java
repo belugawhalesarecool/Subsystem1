@@ -18,8 +18,6 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveIOSparkMax;
 import frc.robot.subsystems.drive.GyroIOReal;
 
-import frc.robot.commands.subsystems.elevator.ELevator;
-
 import frc.robot.util.CommandSnailController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;

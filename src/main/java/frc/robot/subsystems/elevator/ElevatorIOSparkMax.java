@@ -69,15 +69,13 @@ public class ElevatorIOSparkMax implements ElevatorIO{
         elevatorMotor.setVoltage(voltage);
     }
 
-    //Returns distance measurement
-    
+    //Returns distance measurement between robot and setpoint
     public double getDistance() {
         return elevatorEncoder.getPosition();
     }
 
     
     //Setpoint variables
-    
     public void goToSetpoint(double setpoint) {
         this.setpoint = setpoint;
         elevatorPIDController.setReference(setpoint, CANSparkMax.ControlType.kPosition);
@@ -112,6 +110,6 @@ public class ElevatorIOSparkMax implements ElevatorIO{
     public double getI() { return elevatorPIDController.getI(); }
     public double getD() { return elevatorPIDController.getD(); }
     public double getFF() { return elevatorPIDController.getFF(); }
-    // Do we need to add @override after each methods?
+    
 }
 

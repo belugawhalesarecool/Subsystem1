@@ -16,24 +16,24 @@ public interface ElevatorIO {
     public double ELEVATOR_MAX_HEIGHT = 36.0;
     public double ELEVATOR_MIN_HEIGHT = 0.0;
 
-    /** Updates the set of loggable inputs. */
+    //Updates all loggable inputs in case of change
     
     public default void updateInputs(ElevatorIOInputs inputs) {
     }
 
-    /** Run open loop at the specified voltage. */
+    //Runs loop at designated voltage, in case of short circuiting 
     public default void setVoltage(double motorVolts) {
     }
 
-    /** Returns the current distance measurement. */
+    //Returns distance between robot and setpoint
     public default double getDistance() {
         return 0.0;
     }
-
+    //Sets constants for PID
     public default void setPIDConstants(double p, double i, double d, double ff) {
     }
 
-    /** Go to Setpoint */
+    
     public default void goToSetpoint(double setpoint) {
     }
 

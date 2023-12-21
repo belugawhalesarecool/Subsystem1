@@ -21,6 +21,7 @@ import static frc.robot.Constants.Elevator.ElevatorPhysicalConstants.ELEVATOR_PI
 public class Elevator extends SubsystemBase {
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
+//logs information to disk
     private LoggedDashboardNumber p = new LoggedDashboardNumber("Elevator/P", ELEVATOR_PID[0]);
     private LoggedDashboardNumber i = new LoggedDashboardNumber("Elevator/I", ELEVATOR_PID[1]);
     private LoggedDashboardNumber d = new LoggedDashboardNumber("Elevator/D", ELEVATOR_PID[2]);
@@ -30,7 +31,8 @@ public class Elevator extends SubsystemBase {
 
     private final ElevatorIO io;
 
-    // Create a Mechanism2d visualization of the elevator (get better explanation)
+    // MechanismLigament creates an "canvas" where the mechanism would be drawn in a simulation (See physics simulation)
+    //For example, MechanismLigament for elevator would be where it’s attached to the robot’s base.
     private MechanismLigament2d ElevatorMechanism;
 
     public Elevator(ElevatorIO io) {
@@ -49,7 +51,7 @@ public class Elevator extends SubsystemBase {
 
         ElevatorMechanism.setLength(io.getDistance());
 
-        // Update the PID constants if they have changed
+        // Updates the PID constants just in case 
         if (p.get() != io.getP()) 
             io.setP(p.get());
         
@@ -62,12 +64,12 @@ public class Elevator extends SubsystemBase {
         if (ff.get() != io.getFF())
             io.setFF(ff.get());
         
-        // Log Inputs
+        // Logs inputs to disk
         Logger.getInstance().processInputs("Elevator", inputs);
     }
 
     public void setVoltage(double motorVolts) {
-        // limit the elevator if its past its limit
+        // sets a limit for the elevator
         if (io.getDistance() > ElevatorIO.ELEVATOR_MAX_HEIGHT && motorVolts > 0) {
             motorVolts = 0;
         } else if (io.getDistance() < ElevatorIO.ELEVATOR_MIN_HEIGHT && motorVolts < 0) {
@@ -92,15 +94,16 @@ public class Elevator extends SubsystemBase {
     public boolean atSetpoint() {
         return Math.abs(io.getDistance() - setpoint) < ELEVATOR_TOLERANCE;
     }
-
+    //Sets for mechanism
     public void setMechanism(MechanismLigament2d mechanism) {
         ElevatorMechanism = mechanism;
     }
 
+    //MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
+    // off the root node or another ligament object, as shown here. Each MechanismLigament2d object represents a stage of the mechanism. 
     public MechanismLigament2d append(MechanismLigament2d mechanism) {
         return ElevatorMechanism.append(mechanism);
     }
-
     public MechanismLigament2d getElevatorMechanism() {
         return new MechanismLigament2d("Elevator", 5, 36, 5, new Color8Bit(Color.kOrange));
     }

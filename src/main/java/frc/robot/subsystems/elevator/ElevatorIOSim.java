@@ -12,6 +12,7 @@ import com.revrobotics.SparkMaxPIDController;
 
 import static frc.robot.Constants.Elevator.ElevatorSimConstants.*;
 
+// Used to simulate the subsystem
 public class ElevatorIOSim implements ElevatorIO{
     
     private final ProfiledPIDController m_controller =
@@ -30,11 +31,12 @@ public class ElevatorIOSim implements ElevatorIO{
             kElevatorkA
         );
 
-    // This gearbox represents a gearbox containing 4 Vex 775pro motors.
+    //represents a gearbox containing 4 Vex 775pro motors.
     private final DCMotor m_elevatorGearbox = DCMotor.getVex775Pro(4);
 
     private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
 
+    //Creates object for simulation
     private final ElevatorSim sim =
         new ElevatorSim(
             m_elevatorGearbox,
@@ -47,12 +49,13 @@ public class ElevatorIOSim implements ElevatorIO{
             VecBuilder.fill(0.01)
         );
 
+    //Sets encoder up
     private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
     
     public ElevatorIOSim() {
         m_encoder.setDistancePerPulse(kElevatorEncoderDistPerPulse);
     }
-
+    //Updates inputs 
     @Override
     public void updateInputs(ElevatorIOInputs inputs) {
         sim.update(0.02);
@@ -60,24 +63,15 @@ public class ElevatorIOSim implements ElevatorIO{
         inputs.positionMeters = sim.getPositionMeters();
         inputs.velocityMeters = sim.getVelocityMetersPerSecond();
         inputs.currentAmps = new double[] {sim.getCurrentDrawAmps()};
-        // inputs.voltage = new double[] {sim.getBusVoltageV()};
     }
 
-
-
-       
+    //Runs loop at designated voltage
     @Override
     public void setVoltage(double motorVolts) {
         sim.setInputVoltage(motorVolts);
     }
 
-    
-    @Override
-    public double getDistance() {
-        return sim.getPositionMeters();
-    }
-
-    
+    //
     @Override
     public void goToSetpoint(double setpoint) {
         m_controller.setGoal(setpoint);
@@ -85,9 +79,19 @@ public class ElevatorIOSim implements ElevatorIO{
         double feedForwardOutput = m_feedforward.calculate(m_controller.getSetpoint().velocity);
         sim.setInputVoltage(feedForwardOutput + pidOutput);
     }
+    
+    //Returns distance between robot and setpoint
+     @Override
+    public double getDistance() {
+        return sim.getPositionMeters();
+    }
 
-    //what about getDistance
-    //what about atSetpoint
+    //Sets a true or false statement for whether the robot has reached the goal or not. 
+    @Override
+    public boolean atSetpoint() {
+        return m_controller.atGoal();
+    }
+
  
     @Override
     public void setP(double p) {
@@ -134,5 +138,5 @@ public class ElevatorIOSim implements ElevatorIO{
 
 }
 
-// Used to simulate the subsystem
+
 

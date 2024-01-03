@@ -12,11 +12,18 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SpinAuto;
+
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveIO;
 import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveIOSparkMax;
-import frc.robot.subsystems.drive.GyroIOReal;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
+
+
+import static frc.robot.Constants.Elevator.ElevatorPhysicalConstants;
 
 
 import frc.robot.util.CommandSnailController;
@@ -44,10 +51,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * scheduler calls). Instead, the structure of the robot (including subsystems,
  * commands, and button mappings) should be declared here.
  */
+
+ // PROBLEM since we didnt make the other subsystems, wherever we call those variables there's an error
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final GyroIOReal gyro = GyroIOReal.getInstance();
+  private final GyroIOReal gyro = GyroIOReal.getInstance(); //delete?
   // Declaring elevator
   private final Elevator elevator;
 
@@ -129,7 +138,8 @@ public class RobotContainer {
   }
 
 
-//commands to work with other subsystems
+//commands to work with other subsystems 
+// can't reaally work since other subsystems haven't been defined
 
   public CommandBase scoreMid() {
     return new SequentialCommandGroup(

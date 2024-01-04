@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Constants.Elevator.ElevatorPhysicalConstants;
 import frc.robot.commands.SpinAuto;
 
 import frc.robot.subsystems.drive.Drive;
@@ -56,7 +57,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final GyroIOReal gyro = GyroIOReal.getInstance(); //delete?
+  
   // Declaring elevator
   private final Elevator elevator;
 
@@ -80,11 +81,14 @@ public class RobotContainer {
       // Real robot, instantiate hardware IO implementations
       case REAL:
         drive = new Drive(new DriveIOSparkMax(), new Pose2d());
+        elevator = new Elevator(new ElevatorIOSparkMax());
         break;
+        
 
       // Sim robot, instantiate physics sim IO implementations
       case SIM:
         drive = new Drive(new DriveIOSim(), new Pose2d());
+        elevator = new Elevator(new ElevatorIOSim());
         break;
 
       // Replayed robot, disable IO implementations
@@ -100,7 +104,7 @@ public class RobotContainer {
 
     MechanismRoot2d root = mech.getRoot("elevator", 1, 0.5);
     elevator.setMechanism(root.append(elevator.getElevatorMechanism()));
-    laterator.setMechanism(elevator.append(laterator.getLateratorMechanism()));
+    
     // add subsystem mechanisms
     SmartDashboard.putData("Arm Mechanism", mech);
 
@@ -141,43 +145,7 @@ public class RobotContainer {
 //commands to work with other subsystems 
 // can't reaally work since other subsystems haven't been defined
 
-  public CommandBase scoreMid() {
-    return new SequentialCommandGroup(
-        new ParallelCommandGroup(
-            claw.grab(),
-            pivotArm.PIDCommand(Constants.PivotArm.PIVOT_ARM_SETPOINT_MID),
-            elevator.PIDCommand(ElevatorPhysicalConstants.ELEVATOR_SETPOINT_EXTEND)),
-        new WaitCommand(1),
-        claw.release());
-  }
-
-  public CommandBase scoreLow() {
-    return new SequentialCommandGroup(
-        new ParallelCommandGroup(
-            claw.grab(),
-            pivotArm.PIDCommand(Constants.PivotArm.PIVOT_ARM_SETPOINT_BOTTOM),
-            elevator.PIDCommand(ElevatorPhysicalConstants.ELEVATOR_SETPOINT_EXTEND)),
-        new WaitCommand(1),
-        claw.release());
-  }
-
-  public CommandBase holdPos() {
-    return new RunCommand(() -> {
-      claw.release().schedule();
-      pivotArm.PIDCommand(Constants.PivotArm.PIVOT_ARM_SETPOINT_HOLD).schedule();
-      elevator.PIDCommand(ElevatorPhysicalConstants.ELEVATOR_SETPOINT_RETRACT).schedule();
-    }, claw, pivotArm, elevator);
-  }
-
-  public CommandBase grabStation() {
-    return new SequentialCommandGroup(
-        new ParallelCommandGroup(
-            claw.release(),
-            pivotArm.PIDCommand(Constants.PivotArm.PIVOT_ARM_SETPOINT_TOP),
-            elevator.PIDCommand(ElevatorPhysicalConstants.ELEVATOR_SETPOINT_EXTEND)),
-        new WaitCommand(1), // back up and then grab
-        claw.grab());
-  }
+ 
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
